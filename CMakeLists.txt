@@ -10,7 +10,7 @@ find_package (PkgConfig REQUIRED)
 
 # Force a libmraa search and minimum required version every time a config is generated
 unset(MRAA_FOUND CACHE)
-pkg_check_modules (MRAA REQUIRED mraa>=0.8.0)
+pkg_check_modules (MRAA REQUIRED mraa>=0.9.1)
 message (INFO " found mraa version: ${MRAA_VERSION}")
 
 # Appends the cmake/modules path to MAKE_MODULE_PATH variable.
@@ -25,7 +25,7 @@ include (GetGitRevisionDescription)
 git_describe (VERSION "--tags")
 if ("x_${VERSION}" STREQUAL "x_GIT-NOTFOUND" OR "x_${VERSION}" STREQUAL "x_-128-NOTFOUND")
   message (WARNING " - Install git to compile a production UPM!")
-  set (VERSION "v0.4.1-dirty")
+  set (VERSION "v0.5.1-dirty")
 endif ()
 
 message (INFO " - UPM Version ${VERSION}")

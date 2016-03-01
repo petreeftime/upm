@@ -1,17 +1,17 @@
-%module javaupm_grovecircularled
+%module javaupm_kxcjk1013
 %include "../upm.i"
-%include "arrays_java.i";
 
 %{
-    #include "grovecircularled.h"
+    #include "kxcjk1013.h"
 %}
+%include "kxcjk1013.h"
 
-%include "grovecircularled.h"
+%ignore installISR(void (*isr)(char*), void* arg);
 
 %pragma(java) jniclasscode=%{
     static {
         try {
-            System.loadLibrary("javaupm_grovecircularled");
+            System.loadLibrary("javaupm_kxcjk1013");
         } catch (UnsatisfiedLinkError e) {
             System.err.println("Native code library failed to load. \n" + e);
             System.exit(1);

@@ -1,9 +1,17 @@
 /*
+ * Author: Jon Trulson <jtrulson@ics.com>
+ * Copyright (c) 2016 Intel Corporation.
+ *
+ * These modules were rewritten, based on original work by:
+ *
+ * (original my9221/groveledbar)
+ * Author: Yevgeniy Kiveisha <yevgeniy.kiveisha@intel.com>
+ * Copyright (c) 2014 Intel Corporation.
+ *
+ * (grovecircularled)
  * Author: Jun Kato and Yevgeniy Kiveisha <yevgeniy.kiveisha@intel.com>
  * Contributions: Jon Trulson <jtrulson@ics.com>
  * Copyright (c) 2014 Intel Corporation.
- *
- * This module is based on the my9221 driver
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -27,29 +35,14 @@
 #pragma once
 
 #include <string>
-#include <mraa/aio.hpp>
 #include <mraa/common.hpp>
-
 #include <mraa/gpio.hpp>
-
-#define MAX_BIT_PER_BLOCK     16
-#define CMDMODE               0x0000
-#define BIT_HIGH              0x00ff
-#define BIT_LOW               0x0000
-
-#define HIGH                  1
-#define LOW                   0
+#include "my9221.h"
 
 namespace upm {
 
   /**
-   * @brief Grove Circular LED library
-   * @defgroup grovecircularled libupm-grovecircularled
-   * @ingroup seeed display gpio
-   */
-
-  /**
-   * @library grovecircularled
+   * @library my9221
    * @sensor grovecircularled
    * @comname Grove Circular LED
    * @type display
@@ -65,52 +58,39 @@ namespace upm {
    * @image html grovecircularled.jpg
    * @snippet grovecircularled.cxx Interesting
    */
-  class GroveCircularLED {
+
+  class GroveCircularLED : public MY9221 {
   public:
     /**
-     * Instantiates an MY9221 object
+     * Instantiates an GroveCircularLED object
      *
-     * @param di Data pin
-     * @param dcki Clock pin
+     * @param dataPin Data pin
+     * @param clockPin Clock pin
      */
-    GroveCircularLED (uint8_t di, uint8_t dcki);
+    GroveCircularLED(uint8_t dataPin, uint8_t clockPin);
 
     /**
-     * Sets the lighting status
-     *
-     * @param level Selected level for the circular LED (0-24)
-     * @param direction Up or down; up is true and default
+     * GroveCircularLED destructor
      */
-    mraa::Result setLevel (uint8_t level, bool direction=true);
+    ~GroveCircularLED();
 
     /**
-     * Sets the spinner (lights up all the other LEDs but one)
+     * Sets the spinner (turns off all LEDs but selected one)
      *
      * @param position Selected position for the spinner (0-23)
      */
-    mraa::Result setSpinner (uint8_t position);
+    void setSpinner(uint8_t position);
 
     /**
      * Sets the lighting status
      *
-     * @param status Boolean array (24 elements)
+     * @param level Selected level for the circular LED (0-23)
+     * @param direction Up or down; up is true and default
      */
-    mraa::Result setStatus (bool status[24]);
+    void setLevel(uint8_t level, bool direction=true);
 
-    /**
-     * Returns the name of the component
-     */
-    std::string name()
-      {
-        return m_name;
-      }
+  protected:
   private:
-    mraa::Result lockData ();
-    mraa::Result send16bitBlock (short data);
-
-    std::string m_name;
-    mraa::Gpio m_clkPinCtx;
-    mraa::Gpio m_dataPinCtx;
   };
 
 }

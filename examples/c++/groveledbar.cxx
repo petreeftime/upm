@@ -1,6 +1,6 @@
 /*
- * Author: Yevgeniy Kiveisha <yevgeniy.kiveisha@intel.com>
- * Copyright (c) 2014 Intel Corporation.
+ * Author: Jon Trulson <jtrulson@ics.com>
+ * Copyright (c) 2015 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -24,40 +24,54 @@
 
 #include <unistd.h>
 #include <iostream>
-#include "my9221.h"
 #include <signal.h>
+#include "groveledbar.h"
 
-int running = 0;
+using namespace std;
 
-void
-sig_handler(int signo)
+int shouldRun = true;
+
+void sig_handler(int signo)
 {
-    printf("got signal\n");
-    if (signo == SIGINT) {
-        printf("exiting application\n");
-        running = 1;
-    }
+  if (signo == SIGINT)
+    shouldRun = false;
 }
 
-int
-main(int argc, char **argv)
+
+int main ()
 {
-    //! [Interesting]
-    upm::MY9221 *bar = new upm::MY9221(8, 9);
+  signal(SIGINT, sig_handler);
 
-    signal(SIGINT, sig_handler);
+//! [Interesting]
 
-    while (!running) {
-        for (int idx = 1; idx < 11; idx++) {
-            bar->setBarLevel (idx);
-            usleep(1000);
+  // Instantiate a GroveLEDBar, we use D8 for the data, and D9 for the
+  // clock.  This was tested with a Grove LED bar.
+  upm::GroveLEDBar* bar = new upm::GroveLEDBar(8, 9);
+
+  while (shouldRun)
+    {
+      // count up from green to red
+      for (int i=0; i<=10; i++)
+        {
+          bar->setBarLevel(i, true);
+          usleep(100000);
         }
+      sleep(1);
+
+      // count down from red to green
+      for (int i=0; i<=10; i++)
+        {
+          bar->setBarLevel(i, false);
+          usleep(100000);
+        }
+      sleep(1);
     }
-    //! [Interesting]
+//! [Interesting]
 
-    std::cout << "exiting application" << std::endl;
+  cout << "Exiting..." << endl;
+  // turn off the LED's
+  bar->setBarLevel(0);
 
-    delete bar;
-
-    return 0;
+  delete bar;
+  return 0;
 }

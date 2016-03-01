@@ -1,5 +1,5 @@
 /*
- * Author: Jon Trulson <jtrulson@ics.com>
+ * Author: Lay, Kuan Loon <kuan.loon.lay@intel.com>
  * Copyright (c) 2015 Intel Corporation.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -25,54 +25,39 @@
 #include <unistd.h>
 #include <iostream>
 #include <signal.h>
-#include "my9221.h"
+#include "apds9930.h"
 
 using namespace std;
 
 int shouldRun = true;
 
-void sig_handler(int signo)
+void
+sig_handler(int signo)
 {
-  if (signo == SIGINT)
-    shouldRun = false;
+    if (signo == SIGINT)
+        shouldRun = false;
 }
 
-
-int main ()
+int
+main()
 {
-  signal(SIGINT, sig_handler);
+    signal(SIGINT, sig_handler);
+    //! [Interesting]
+    // Instantiate a Digital Proximity and Ambient Light sensor on iio device 4
+    upm::APDS9930* light_proximity = new upm::APDS9930(4);
 
-//! [Interesting] 
-
-  // Instantiate a MY9221, we use D2 for the data, and D3 for the
-  // data clock.  This was tested with a Grove LED bar.
-
-  upm::MY9221* bar = new upm::MY9221(2, 3);
-  
-  while (shouldRun)
-    {
-      // count up from green to red
-      for (int i=1; i<=10; i++)
-        {
-          bar->setBarLevel(i, true);
-          usleep(50000);
-        }
-      sleep(1);
-
-      // count down from red to green
-      for (int i=1; i<=10; i++)
-        {
-          bar->setBarLevel(i, false);
-          usleep(50000);
-        }
-      sleep(1);
+    while (shouldRun) {
+        float lux = light_proximity->getAmbient();
+        cout << "Luminance value is " << lux << endl;
+        float proximity = light_proximity->getProximity();
+        cout << "Proximity value is " << proximity << endl;
+        sleep(1);
     }
-//! [Interesting]
+    //! [Interesting]
 
-  cout << "Exiting..." << endl;
-  // turn off the LED's
-  bar->setBarLevel(0, true);
+    cout << "Exiting" << endl;
 
-  delete bar;
-  return 0;
+    delete light_proximity;
+
+    return 0;
 }
